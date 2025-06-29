@@ -1,0 +1,22 @@
+name: "career-seekers"
+services:
+  fs-postgres:
+    container_name: fs-postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${FS_DB_USER}
+      POSTGRES_PASSWORD: ${FS_DB_PASSWORD}
+    volumes:
+      - fs-postgres-data:/var/lib/postgresql/data
+    ports:
+      - ${FS_DB_PORT}:${FS_DB_PORT}
+    networks:
+      - backend-net
+
+volumes:
+  fs-postgres-data:
+
+networks:
+  backend-net:
+    driver: bridge
