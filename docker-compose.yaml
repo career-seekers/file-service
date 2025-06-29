@@ -10,7 +10,7 @@ services:
     volumes:
       - fs-postgres-data:/var/lib/postgresql/data
     ports:
-      - ${FS_DB_PORT}:${FS_DB_PORT}
+      - "8294:8294"
     networks:
       - backend-net
 
