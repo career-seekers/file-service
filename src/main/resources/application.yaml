@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: cs-file-service
+
+
+database:
+  host: ${FS_DB_HOST}
+  port: ${FS_DB_PORT}
+  name: ${FS_DB_NAME}
+  username: ${FS_DB_USER}
+  password: ${FS_DB_PASSWORD}
+  schema: ${FS_DB_SCHEMA}
+
+storage:
+  location: ${STORAGE_LOCATION}
+
+server:
+  port: ${SERVER_INTERNAL_PORT}
