@@ -1,6 +1,5 @@
 package org.esc.csfileservice.entities
 
-import org.esc.csfileservice.enums.FileTypes
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
@@ -12,7 +11,6 @@ data class FilesStorage(
     val originalFilename: String,
     val storedFilename: UUID,
     val contentType: String,
-    val size: Long,
-    val fileType: FileTypes,
+    val fileType: String,
     val filePath: String,
 )

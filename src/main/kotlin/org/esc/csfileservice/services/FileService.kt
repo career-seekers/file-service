@@ -1,20 +1,18 @@
 package org.esc.csfileservice.services
 
-import org.esc.csfileservice.dto.files.SaveFileDto
 import org.esc.csfileservice.entities.FilesStorage
+import org.esc.csfileservice.enums.FileTypes
 import org.esc.csfileservice.repositories.FilesStorageRepository
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StringUtils
-import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import java.util.UUID
 
 @Service
@@ -33,27 +31,25 @@ class FileService(
     }
 
     @Transactional
-    fun saveFile(item: SaveFileDto): Mono<FilesStorage> {
-        val originalFilename = StringUtils.cleanPath(item.file.originalFilename ?: "file")
+    fun saveFile(file: FilePart, fileType: FileTypes): Mono<FilesStorage> {
+        val originalFilename = StringUtils.cleanPath(file.filename())
         val extension = originalFilename.substringAfterLast('.', "")
         val storedFilename = UUID.randomUUID()
 
-        return store(item.file, storedFilename, extension)
+        return store(file, storedFilename, extension)
             .flatMap { filePath ->
                 val entity = FilesStorage(
-                    id = null,
                     originalFilename = originalFilename,
                     storedFilename = storedFilename,
-                    contentType = item.file.contentType ?: "application/octet-stream",
-                    size = item.file.size,
-                    fileType = item.fileType,
-                    filePath = filePath
+                    contentType = file.headers().contentType?.toString() ?: "application/octet-stream",
+                    fileType = fileType.name,
+                    filePath = filePath,
                 )
                 filesStorageRepository.save(entity)
             }
     }
 
-    private fun store(file: MultipartFile, storedFilename: UUID, extension: String): Mono<String> {
+    private fun store(file: FilePart, storedFilename: UUID, extension: String): Mono<String> {
         val uniqueName = storedFilename.toString() + if (extension.isNotEmpty()) ".$extension" else ""
         val destinationFile = rootPath.resolve(uniqueName).normalize()
 
@@ -61,12 +57,7 @@ class FileService(
             return Mono.error(RuntimeException("Неверный путь для сохранения файла: $uniqueName"))
         }
 
-        return Mono.fromCallable {
-            file.inputStream.use { input ->
-                Files.copy(input, destinationFile, StandardCopyOption.REPLACE_EXISTING)
-            }
-            destinationFile.toString()
-        }
-            .subscribeOn(Schedulers.boundedElastic())
+        return file.transferTo(destinationFile)
+            .thenReturn(destinationFile.toString())
     }
 }
