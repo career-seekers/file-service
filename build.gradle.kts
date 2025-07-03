@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.25"
-    kotlin("kapt") version "1.9.0"
+    kotlin("kapt") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.serialization") version "2.1.20"
     id("org.springframework.boot") version "3.5.0"
@@ -31,6 +31,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
