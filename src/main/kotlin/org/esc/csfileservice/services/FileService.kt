@@ -2,12 +2,16 @@ package org.esc.csfileservice.services
 
 import org.esc.csfileservice.entities.FilesStorage
 import org.esc.csfileservice.enums.FileTypes
+import org.esc.csfileservice.exceptions.NotFoundException
 import org.esc.csfileservice.repositories.FilesStorageRepository
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.PathResource
+import org.springframework.core.io.Resource
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StringUtils
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.IOException
 import java.nio.file.Files
@@ -28,6 +32,28 @@ class FileService(
         } catch (ex: IOException) {
             throw RuntimeException("Не удалось создать директорию для хранения файлов: $rootLocation", ex)
         }
+    }
+
+    fun getAllFiles(): Flux<FilesStorage> {
+        return filesStorageRepository.findAll()
+    }
+
+    fun getFileById(id: Long): Mono<FilesStorage> {
+        return filesStorageRepository.findById(id)
+            .switchIfEmpty(Mono.error(NotFoundException("File with ID $id not found.")))
+    }
+
+    fun getFileContentById(id: Long): Mono<Resource> {
+        return filesStorageRepository.findById(id)
+            .switchIfEmpty(Mono.error(NotFoundException("File with ID $id not found.")))
+            .flatMap { fileStorage ->
+                val path = Paths.get(fileStorage.filePath)
+                if (!Files.exists(path)) {
+                    Mono.error<Resource>(NotFoundException("File with path $path not found."))
+                } else {
+                    Mono.just(PathResource(path))
+                }
+            }
     }
 
     @Transactional

@@ -1,0 +1,80 @@
+package org.esc.csfileservice.controllers
+
+import org.esc.csfileservice.entities.FilesStorage
+import org.esc.csfileservice.enums.FileTypes
+import org.esc.csfileservice.services.FileService
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.multipart.FilePart
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+@RestController
+@RequestMapping("/file-service/v1/files")
+class FilesController(private val fileService: FileService) {
+
+    @GetMapping("/")
+    fun getAll(): Flux<FilesStorage> {
+        return fileService.getAllFiles()
+    }
+
+    @GetMapping("/view/{id}")
+    fun viewFile(@PathVariable id: Long): Mono<ResponseEntity<Resource>> {
+        return fileService.getFileById(id)
+            .flatMap { fileStorage ->
+                fileService.getFileContentById(id)
+                    .map { resource ->
+                        val contentType = try {
+                            MediaType.parseMediaType(fileStorage.contentType)
+                        } catch (_: Exception) {
+                            MediaType.APPLICATION_OCTET_STREAM
+                        }
+
+                        ResponseEntity.ok()
+                            .contentType(contentType)
+                            .body(resource)
+                    }
+            }
+            .defaultIfEmpty(ResponseEntity.notFound().build())
+            .onErrorResume { ex ->
+                Mono.error(ex)
+            }
+    }
+
+
+    @GetMapping("/download/{id}")
+    fun downloadFile(@PathVariable id: Long): Mono<ResponseEntity<Resource>> {
+        return fileService.getFileById(id)
+            .flatMap { fileStorage ->
+                fileService.getFileContentById(id)
+                    .map { resource ->
+                        val contentType = MediaType.parseMediaType(fileStorage.contentType)
+
+                        ResponseEntity.ok()
+                            .contentType(contentType)
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileStorage.originalFilename}\"")
+                            .body(resource)
+                    }
+            }
+            .defaultIfEmpty(ResponseEntity.notFound().build())
+            .onErrorResume { ex ->
+                Mono.error(ex)
+            }
+    }
+
+    @PostMapping(
+        "uploadAvatar",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadAvatar(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.AVATAR)
+    }
+}
