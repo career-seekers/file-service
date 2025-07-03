@@ -77,4 +77,60 @@ class FilesController(private val fileService: FileService) {
     fun uploadAvatar(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
         return fileService.saveFile(file, FileTypes.AVATAR)
     }
+
+    @PostMapping(
+        "uploadSnils",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadSnils(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.SNILS)
+    }
+
+    @PostMapping(
+        "uploadStudyingCertificate",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadStudyingCertificate(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.STUDYING_CERTIFICATE)
+    }
+
+    @PostMapping(
+        "uploadAdditionalStudyingCertificate",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadAdditionalStudyingCertificate(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.ADDITIONAL_STUDYING_CERTIFICATE)
+    }
+
+    @PostMapping(
+        "uploadConsentToChildPDP",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadConsentToChildPDP(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.CONSENT_TO_CHILD_PDP)
+    }
+
+    @PostMapping(
+        "uploadConsentToMentorPDP",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadConsentToMentorPDP(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.CONSENT_TO_MENTOR_PDP)
+    }
+
+    @PostMapping(
+        "uploadConsentToTutorPDP",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadConsentToTutorPDP(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.CONSENT_TO_TUTOR_PDP)
+    }
+
+    @PostMapping(
+        "uploadConsentToExpertPDP",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadConsentToExpertPDP(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.CONSENT_TO_EXPERT_PDP)
+    }
 }
