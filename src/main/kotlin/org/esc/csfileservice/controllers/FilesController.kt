@@ -26,6 +26,11 @@ class FilesController(private val fileService: FileService) {
         return fileService.getAllFiles()
     }
 
+    @GetMapping("/{id}")
+    fun getById(@PathVariable("id") id: Long): Mono<FilesStorage> {
+        return fileService.getFileById(id)
+    }
+
     @GetMapping("/view/{id}")
     fun viewFile(@PathVariable id: Long): Mono<ResponseEntity<Resource>> {
         return fileService.getFileById(id)
