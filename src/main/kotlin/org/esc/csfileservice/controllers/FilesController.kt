@@ -2,12 +2,14 @@ package org.esc.csfileservice.controllers
 
 import org.esc.csfileservice.entities.FilesStorage
 import org.esc.csfileservice.enums.FileTypes
+import org.esc.csfileservice.io.BasicSuccessfulResponse
 import org.esc.csfileservice.services.FileService
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -65,7 +67,10 @@ class FilesController(private val fileService: FileService) {
 
                         ResponseEntity.ok()
                             .contentType(contentType)
-                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileStorage.originalFilename}\"")
+                            .header(
+                                HttpHeaders.CONTENT_DISPOSITION,
+                                "attachment; filename=\"${fileStorage.originalFilename}\""
+                            )
                             .body(resource)
                     }
             }
@@ -138,4 +143,8 @@ class FilesController(private val fileService: FileService) {
     fun uploadConsentToExpertPDP(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
         return fileService.saveFile(file, FileTypes.CONSENT_TO_EXPERT_PDP)
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
+
 }
