@@ -3,6 +3,8 @@ package org.esc.csfileservice.services
 import org.esc.csfileservice.entities.FilesStorage
 import org.esc.csfileservice.enums.FileTypes
 import org.esc.csfileservice.exceptions.NotFoundException
+import org.esc.csfileservice.io.BasicSuccessfulResponse
+import org.esc.csfileservice.io.converters.toHttpResponse
 import org.esc.csfileservice.repositories.FilesStorageRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.PathResource
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StringUtils
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -72,6 +75,19 @@ class FileService(
                     filePath = filePath,
                 )
                 filesStorageRepository.save(entity)
+            }
+    }
+
+    @Transactional
+    fun deleteById(id: Long): Mono<BasicSuccessfulResponse<String>> {
+        return getFileById(id)
+            .flatMap { fileStorage ->
+                val path = Paths.get(fileStorage.filePath)
+
+                Mono.fromCallable { Files.deleteIfExists(path) }
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .then(filesStorageRepository.deleteById(id))
+                    .thenReturn("Document with id $id removed successfully.".toHttpResponse())
             }
     }
 
