@@ -26,8 +26,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t scobca/cs-file-service:latest .
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-      - name: Push Docker image
-        run: docker push scobca/cs-file-service:latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: scobca/cs-file-service:latest
+          platforms: linux/amd64,linux/arm64/v8
