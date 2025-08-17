@@ -11,6 +11,10 @@ plugins {
 group = "org.esc"
 version = "0.0.1-SNAPSHOT"
 
+kapt {
+    includeCompileClasspath = false
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
