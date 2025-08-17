@@ -24,7 +24,7 @@ import java.util.UUID
 
 @Service
 class FileService(
-    @Value("\${storage.location}") private val rootLocation: String,
+    @param:Value("\${storage.location}") private val rootLocation: String,
     private val filesStorageRepository: FilesStorageRepository
 ) {
     private val rootPath: Path = Paths.get(rootLocation).toAbsolutePath().normalize()
