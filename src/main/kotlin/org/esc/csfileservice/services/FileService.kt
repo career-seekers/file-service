@@ -24,9 +24,11 @@ import java.util.UUID
 
 @Service
 class FileService(
-    @param:Value("\${storage.location}") private val rootLocation: String,
     private val filesStorageRepository: FilesStorageRepository
 ) {
+    @Value("\${storage.location}")
+    private lateinit var rootLocation: String
+
     private val rootPath: Path = Paths.get(rootLocation).toAbsolutePath().normalize()
 
     init {
