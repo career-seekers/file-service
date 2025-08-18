@@ -8,7 +8,7 @@ plugins {
     id("it.nicolasfarabegoli.conventional-commits") version "3.1.3"
 }
 
-group = "org.esc"
+group = "org.careerseekers"
 version = "0.0.1-SNAPSHOT"
 
 kapt {
