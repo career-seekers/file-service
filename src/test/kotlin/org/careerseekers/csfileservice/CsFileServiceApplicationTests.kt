@@ -1,4 +1,4 @@
-package org.esc.csfileservice
+package org.careerseekers.csfileservice
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

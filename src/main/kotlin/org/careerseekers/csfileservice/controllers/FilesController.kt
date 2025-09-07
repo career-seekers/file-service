@@ -144,6 +144,14 @@ class FilesController(private val fileService: FileService) {
         return fileService.saveFile(file, FileTypes.CONSENT_TO_EXPERT_PDP)
     }
 
+    @PostMapping(
+        "uploadBirthCertificate",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadBirthCertificate(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.BIRTH_CERTIFICATE)
+    }
+
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
 
