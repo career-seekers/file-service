@@ -51,6 +51,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.springframework:spring-jdbc")
+    implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.flywaydb:flyway-core")
     runtimeOnly("org.postgresql:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")
