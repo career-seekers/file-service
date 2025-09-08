@@ -14,6 +14,6 @@ data class FilesStorage(
     val contentType: String,
     val fileType: String,
     val filePath: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
 )
