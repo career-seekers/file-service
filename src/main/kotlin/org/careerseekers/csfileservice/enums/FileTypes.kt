@@ -10,4 +10,5 @@ enum class FileTypes {
     CONSENT_TO_TUTOR_PDP,
     CONSENT_TO_EXPERT_PDP,
     BIRTH_CERTIFICATE,
+    DIRECTION_ICON,
 }
