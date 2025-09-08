@@ -10,41 +10,22 @@ import io.r2dbc.spi.ConnectionFactoryOptions.PASSWORD
 import io.r2dbc.spi.ConnectionFactoryOptions.PORT
 import io.r2dbc.spi.ConnectionFactoryOptions.USER
 import io.r2dbc.spi.Option
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class DatabaseConfig {
-
-    @Value("\${database.host}")
-    private lateinit var databaseHost: String
-
-    @Value("\${database.port}")
-    private var databasePort: Int = 5432
-
-    @Value("\${database.name}")
-    private lateinit var databaseName: String
-
-    @Value("\${database.username}")
-    private lateinit var databaseUsername: String
-
-    @Value("\${database.password}")
-    private lateinit var databasePassword: String
-
-    @Value("\${database.schema}")
-    private lateinit var databaseSchema: String
+class DatabaseConfig(private val databaseProperties: DatabaseProperties) {
 
     @Bean
     fun connectionFactory(): ConnectionFactory {
         val options = ConnectionFactoryOptions.builder()
             .option(DRIVER, "postgresql")
-            .option(HOST, databaseHost)
-            .option(PORT, databasePort)
-            .option(DATABASE, databaseName)
-            .option(USER, databaseUsername)
-            .option(PASSWORD, databasePassword)
-            .option(Option.valueOf("schema"), databaseSchema)
+            .option(HOST, databaseProperties.host)
+            .option(PORT, databaseProperties.port.toInt())
+            .option(DATABASE, databaseProperties.name)
+            .option(USER, databaseProperties.username)
+            .option(PASSWORD, databaseProperties.password)
+            .option(Option.valueOf("schema"), databaseProperties.schema)
             .build()
 
         return ConnectionFactories.get(options)
