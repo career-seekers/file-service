@@ -152,6 +152,14 @@ class FilesController(private val fileService: FileService) {
         return fileService.saveFile(file, FileTypes.BIRTH_CERTIFICATE)
     }
 
+    @PostMapping(
+        "uploadDirectionIcon",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun uploadDirectionIcon(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
+        return fileService.saveFile(file, FileTypes.DIRECTION_ICON)
+    }
+
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
 
