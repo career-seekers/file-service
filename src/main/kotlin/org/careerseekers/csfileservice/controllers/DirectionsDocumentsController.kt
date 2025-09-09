@@ -20,6 +20,6 @@ class DirectionsDocumentsController(private val fileService: FileService) {
         @RequestPart("file") file: FilePart,
         @RequestPart("type") type: String,
     ): Mono<FilesStorage> {
-        return fileService.saveFile(file, FileTypes.valueOf(type.uppercase()))
+        return fileService.saveFile(file, FileTypes.valueOf(type.uppercase().trim().trim('"')))
     }
 }
