@@ -11,4 +11,13 @@ enum class FileTypes {
     CONSENT_TO_EXPERT_PDP,
     BIRTH_CERTIFICATE,
     DIRECTION_ICON,
+
+    // Directions documents types
+    TASK,
+    CRITERIA,
+    STATEMENT,
+    FINAL_TASK,
+    FINAL_CRITERIA,
+    FINAL_STATEMENT,
+    DESCRIPTION,
 }
