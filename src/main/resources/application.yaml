@@ -16,3 +16,13 @@ storage:
 
 server:
   port: ${SERVER_INTERNAL_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
