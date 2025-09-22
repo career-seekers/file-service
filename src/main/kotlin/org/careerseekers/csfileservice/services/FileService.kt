@@ -43,16 +43,16 @@ class FileService(
 
     fun getFileById(id: Long): Mono<FilesStorage> {
         return filesStorageRepository.findById(id)
-            .switchIfEmpty(Mono.error(NotFoundException("File with ID $id not found.")))
+            .switchIfEmpty(Mono.error(NotFoundException("Файл с ID $id не найден.")))
     }
 
     fun getFileContentById(id: Long): Mono<Resource> {
         return filesStorageRepository.findById(id)
-            .switchIfEmpty(Mono.error(NotFoundException("File with ID $id not found.")))
+            .switchIfEmpty(Mono.error(NotFoundException("Файл с ID $id не найден.")))
             .flatMap { fileStorage ->
                 val path = Paths.get(fileStorage.filePath)
                 if (!Files.exists(path)) {
-                    Mono.error<Resource>(NotFoundException("File with path $path not found."))
+                    Mono.error<Resource>(NotFoundException("Файл по пути $path не найден"))
                 } else {
                     Mono.just(PathResource(path))
                 }
@@ -87,7 +87,7 @@ class FileService(
                 Mono.fromCallable { Files.deleteIfExists(path) }
                     .subscribeOn(Schedulers.boundedElastic())
                     .then(filesStorageRepository.deleteById(id))
-                    .thenReturn("Document with id $id removed successfully.".toHttpResponse())
+                    .thenReturn("Файл с ID $id удалён успешно.".toHttpResponse())
             }
     }
 
