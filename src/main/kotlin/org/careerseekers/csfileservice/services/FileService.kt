@@ -25,7 +25,8 @@ import java.util.UUID
 @Service
 class FileService(
     @param:Value("\${storage.location}") val rootLocation: String,
-    private val filesStorageRepository: FilesStorageRepository
+    private val filesStorageRepository: FilesStorageRepository,
+    private val yandexDiskService: YandexDiskService
 ) {
     private val rootPath: Path = Paths.get(rootLocation).toAbsolutePath().normalize()
 
@@ -52,7 +53,7 @@ class FileService(
             .flatMap { fileStorage ->
                 val path = Paths.get(fileStorage.filePath)
                 if (!Files.exists(path)) {
-                    Mono.error<Resource>(NotFoundException("Файл по пути $path не найден"))
+                    Mono.error(NotFoundException("Файл по пути $path не найден"))
                 } else {
                     Mono.just(PathResource(path))
                 }
@@ -75,6 +76,10 @@ class FileService(
                     filePath = filePath,
                 )
                 filesStorageRepository.save(entity)
+            }
+            .flatMap { savedEntity ->
+                yandexDiskService.uploadFileToDisk(file, savedEntity)
+                    .thenReturn(savedEntity)
             }
     }
 
