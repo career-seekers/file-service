@@ -18,7 +18,7 @@ class YandexDiskService(
 
     fun uploadFileToDisk(file: FilePart, item: FilesStorage): Mono<Void> {
         return webClient.get()
-            .uri("/v1/disk/resources/upload?path=/test/${item.storedFilename}&overwrite=true")
+            .uri("/v1/disk/resources/upload?path=/career-seekers-backups/docs/${item.storedFilename}&overwrite=true")
             .header("Authorization", properties.oauthToken)
             .retrieve()
             .bodyToMono(JsonNode::class.java)
