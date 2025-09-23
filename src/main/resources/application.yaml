@@ -2,7 +2,6 @@ spring:
   application:
     name: cs-file-service
 
-
 database:
   host: ${FS_DB_HOST}
   port: ${FS_DB_PORT}
@@ -13,6 +12,11 @@ database:
 
 storage:
   location: ${STORAGE_LOCATION}
+
+cloud:
+  disk:
+    base-url: ${YANDEX_BASE_URL}
+    oauth-token: ${YANDEX_OAUTH}
 
 server:
   port: ${SERVER_INTERNAL_PORT}
