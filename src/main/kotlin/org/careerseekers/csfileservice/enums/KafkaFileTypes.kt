@@ -1,6 +1,8 @@
 package org.careerseekers.csfileservice.enums
 
-enum class KafkaFileTypes {
-    DB_DUMP,
-    DOCUMENT,
+enum class KafkaFileTypes(private val alias: String) {
+    DB_DUMP("db_dump"),
+    DOCUMENT("docs");
+
+    fun KafkaFileTypes.getAlias() = this.alias
 }
