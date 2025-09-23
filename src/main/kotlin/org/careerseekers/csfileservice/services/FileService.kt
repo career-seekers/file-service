@@ -1,14 +1,18 @@
 package org.careerseekers.csfileservice.services
 
+import org.careerseekers.csfileservice.dto.CloudFileSavingDto
 import org.careerseekers.csfileservice.entities.FilesStorage
 import org.careerseekers.csfileservice.enums.FileTypes
+import org.careerseekers.csfileservice.enums.KafkaFileTypes
 import org.careerseekers.csfileservice.exceptions.NotFoundException
 import org.careerseekers.csfileservice.io.BasicSuccessfulResponse
 import org.careerseekers.csfileservice.io.converters.toHttpResponse
 import org.careerseekers.csfileservice.repositories.FilesStorageRepository
+import org.careerseekers.csfileservice.services.kafka.producers.CloudFileSavingKafkaProducer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,7 +30,7 @@ import java.util.UUID
 class FileService(
     @param:Value("\${storage.location}") val rootLocation: String,
     private val filesStorageRepository: FilesStorageRepository,
-    private val yandexDiskService: YandexDiskService
+    private val cloudFileSavingKafkaProducer: CloudFileSavingKafkaProducer,
 ) {
     private val rootPath: Path = Paths.get(rootLocation).toAbsolutePath().normalize()
 
@@ -78,8 +82,27 @@ class FileService(
                 filesStorageRepository.save(entity)
             }
             .flatMap { savedEntity ->
-                yandexDiskService.uploadFileToDisk(file, savedEntity)
-                    .thenReturn(savedEntity)
+                file.content()
+                    .reduce(ByteArray(0)) { acc, dataBuffer ->
+                        val newArray = ByteArray(acc.size + dataBuffer.readableByteCount())
+
+                        System.arraycopy(acc, 0, newArray, 0, acc.size)
+                        dataBuffer.read(newArray, acc.size, dataBuffer.readableByteCount())
+                        DataBufferUtils.release(dataBuffer)
+                        newArray
+                    }
+                    .flatMap { fileBytes ->
+                        Mono.fromRunnable<CloudFileSavingDto> {
+                            cloudFileSavingKafkaProducer.sendMessage(
+                                CloudFileSavingDto(
+                                    fileBytes = fileBytes,
+                                    filename = storedFilename.toString(),
+                                    fileType = KafkaFileTypes.DOCUMENT
+                                )
+                            )
+                        }.subscribeOn(Schedulers.boundedElastic())
+                            .thenReturn(savedEntity)
+                    }
             }
     }
 
