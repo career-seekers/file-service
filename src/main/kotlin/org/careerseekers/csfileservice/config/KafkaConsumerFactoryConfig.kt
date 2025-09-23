@@ -26,7 +26,7 @@ class KafkaConsumerFactoryConfig(private val properties: KafkaProperties) {
              *  Connecting to Kafka and serializing keys and values
              */
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to properties.bootstrapServers,
-            ConsumerConfig.GROUP_ID_CONFIG to "mail_service_consumers",
+            ConsumerConfig.GROUP_ID_CONFIG to "file_service_consumers",
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to PolymorphicKafkaSerializer::class.java,
 

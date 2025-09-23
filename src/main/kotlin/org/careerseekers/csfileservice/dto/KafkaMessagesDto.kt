@@ -14,7 +14,7 @@ sealed class KafkaMessagesDto : DtoClass
 data class CloudFileSavingDto(
     val fileBytes: ByteArray,
     val filename: String,
-    val type: KafkaFileTypes,
+    val fileType: KafkaFileTypes,
 ) : KafkaMessagesDto() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -24,7 +24,7 @@ data class CloudFileSavingDto(
 
         if (!fileBytes.contentEquals(other.fileBytes)) return false
         if (filename != other.filename) return false
-        if (type != other.type) return false
+        if (fileType != other.fileType) return false
 
         return true
     }
@@ -32,7 +32,7 @@ data class CloudFileSavingDto(
     override fun hashCode(): Int {
         var result = fileBytes.contentHashCode()
         result = 31 * result + filename.hashCode()
-        result = 31 * result + type.hashCode()
+        result = 31 * result + fileType.hashCode()
         return result
     }
 }
