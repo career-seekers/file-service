@@ -1,11 +1,14 @@
 package org.careerseekers.csfileservice.services
 
+import org.careerseekers.csfileservice.dto.CloudFileSavingDto
 import org.careerseekers.csfileservice.entities.FilesStorage
 import org.careerseekers.csfileservice.enums.FileTypes
+import org.careerseekers.csfileservice.enums.KafkaFileTypes
 import org.careerseekers.csfileservice.exceptions.NotFoundException
 import org.careerseekers.csfileservice.io.BasicSuccessfulResponse
 import org.careerseekers.csfileservice.io.converters.toHttpResponse
 import org.careerseekers.csfileservice.repositories.FilesStorageRepository
+import org.careerseekers.csfileservice.services.kafka.producers.CloudFileSavingKafkaProducer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
@@ -25,7 +28,8 @@ import java.util.UUID
 @Service
 class FileService(
     @param:Value("\${storage.location}") val rootLocation: String,
-    private val filesStorageRepository: FilesStorageRepository
+    private val filesStorageRepository: FilesStorageRepository,
+    private val cloudFileSavingKafkaProducer: CloudFileSavingKafkaProducer,
 ) {
     private val rootPath: Path = Paths.get(rootLocation).toAbsolutePath().normalize()
 
@@ -52,7 +56,7 @@ class FileService(
             .flatMap { fileStorage ->
                 val path = Paths.get(fileStorage.filePath)
                 if (!Files.exists(path)) {
-                    Mono.error<Resource>(NotFoundException("Файл по пути $path не найден"))
+                    Mono.error(NotFoundException("Файл по пути $path не найден"))
                 } else {
                     Mono.just(PathResource(path))
                 }
@@ -76,6 +80,27 @@ class FileService(
                 )
                 filesStorageRepository.save(entity)
             }
+            .flatMap { savedEntity ->
+                Mono.fromRunnable<CloudFileSavingDto> {
+                    cloudFileSavingKafkaProducer.sendMessage(
+                        CloudFileSavingDto(
+                            filePath = savedEntity.filePath,
+                            filename = "${storedFilename}.${getFileExtension(savedEntity.originalFilename)}",
+                            fileType = KafkaFileTypes.DOCUMENT
+                        )
+                    )
+                }.subscribeOn(Schedulers.boundedElastic())
+                    .thenReturn(savedEntity)
+            }
+    }
+
+    private fun getFileExtension(filename: String): String? {
+        val index = filename.lastIndexOf('.')
+        return if (index != -1 && index != filename.length - 1) {
+            filename.substring(index + 1)
+        } else {
+            null
+        }
     }
 
     @Transactional

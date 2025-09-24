@@ -1,7 +1,18 @@
 spring:
   application:
     name: cs-file-service
-
+  kafka:
+    bootstrap-servers: ${KAFKA1_BOOTSTRAP_SERVICE_URL},${KAFKA2_BOOTSTRAP_SERVICE_URL},${KAFKA3_BOOTSTRAP_SERVICE_URL}
+    consumer:
+      properties:
+        session:
+          timeout:
+            ms: 60000
+        reconnect:
+          backoff:
+            ms: 1000
+            max:
+              ms: 20000
 
 database:
   host: ${FS_DB_HOST}
@@ -13,6 +24,11 @@ database:
 
 storage:
   location: ${STORAGE_LOCATION}
+
+cloud:
+  disk:
+    base-url: ${YANDEX_BASE_URL}
+    oauth-token: ${YANDEX_OAUTH}
 
 server:
   port: ${SERVER_INTERNAL_PORT}
