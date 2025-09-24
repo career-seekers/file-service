@@ -12,7 +12,6 @@ import org.careerseekers.csfileservice.services.kafka.producers.CloudFileSavingK
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
-import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -82,28 +81,26 @@ class FileService(
                 filesStorageRepository.save(entity)
             }
             .flatMap { savedEntity ->
-                file.content()
-                    .reduce(ByteArray(0)) { acc, dataBuffer ->
-                        val newArray = ByteArray(acc.size + dataBuffer.readableByteCount())
-
-                        System.arraycopy(acc, 0, newArray, 0, acc.size)
-                        dataBuffer.read(newArray, acc.size, dataBuffer.readableByteCount())
-                        DataBufferUtils.release(dataBuffer)
-                        newArray
-                    }
-                    .flatMap { fileBytes ->
-                        Mono.fromRunnable<CloudFileSavingDto> {
-                            cloudFileSavingKafkaProducer.sendMessage(
-                                CloudFileSavingDto(
-                                    fileBytes = fileBytes,
-                                    filename = storedFilename.toString(),
-                                    fileType = KafkaFileTypes.DOCUMENT
-                                )
-                            )
-                        }.subscribeOn(Schedulers.boundedElastic())
-                            .thenReturn(savedEntity)
-                    }
+                Mono.fromRunnable<CloudFileSavingDto> {
+                    cloudFileSavingKafkaProducer.sendMessage(
+                        CloudFileSavingDto(
+                            filePath = savedEntity.filePath,
+                            filename = "${storedFilename}.${getFileExtension(savedEntity.originalFilename)}",
+                            fileType = KafkaFileTypes.DOCUMENT
+                        )
+                    )
+                }.subscribeOn(Schedulers.boundedElastic())
+                    .thenReturn(savedEntity)
             }
+    }
+
+    private fun getFileExtension(filename: String): String? {
+        val index = filename.lastIndexOf('.')
+        return if (index != -1 && index != filename.length - 1) {
+            filename.substring(index + 1)
+        } else {
+            null
+        }
     }
 
     @Transactional

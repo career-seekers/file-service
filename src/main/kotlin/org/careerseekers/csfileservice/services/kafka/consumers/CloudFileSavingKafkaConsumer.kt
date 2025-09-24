@@ -22,9 +22,9 @@ class CloudFileSavingKafkaConsumer(private val yandexDiskService: YandexDiskServ
         val message = consumerRecord.value()
 
         yandexDiskService.uploadFileToDisk(
-            fileBytes = message.fileBytes,
+            filePath = message.filePath,
             filename = message.filename,
-            fileType = message.fileType
+            fileType = message.fileType,
         ).subscribe()
         acknowledgment.acknowledge()
     }
