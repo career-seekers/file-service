@@ -1,0 +1,2 @@
+ALTER TABLE files_storage
+    ADD COLUMN verified BOOLEAN DEFAULT FALSE;
