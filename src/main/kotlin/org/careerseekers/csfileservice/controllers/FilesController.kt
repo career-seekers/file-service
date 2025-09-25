@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -159,6 +160,9 @@ class FilesController(private val fileService: FileService) {
     fun uploadDirectionIcon(@RequestPart("file") file: FilePart): Mono<FilesStorage> {
         return fileService.saveFile(file, FileTypes.DIRECTION_ICON)
     }
+
+    @PatchMapping("/verify/{id}")
+    fun verify(@PathVariable id: Long): Mono<String> = fileService.verifyFile(id)
 
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
