@@ -104,6 +104,16 @@ class FileService(
     }
 
     @Transactional
+    fun verifyFile(id: Long): Mono<String> {
+        return getFileById(id)
+            .flatMap { fileStorageItem ->
+                fileStorageItem .verified = true
+                filesStorageRepository.save(fileStorageItem)
+                    .thenReturn("File verified successfully.")
+            }
+    }
+
+    @Transactional
     fun deleteById(id: Long): Mono<BasicSuccessfulResponse<String>> {
         return getFileById(id)
             .flatMap { fileStorage ->
