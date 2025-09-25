@@ -109,7 +109,7 @@ class FileService(
             .flatMap { fileStorageItem ->
                 fileStorageItem.verified = true
                 filesStorageRepository.save(fileStorageItem)
-                    .thenReturn("File verified successfully.")
+                    .map { "File verified successfully." }
             }
     }
 
