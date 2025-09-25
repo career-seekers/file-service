@@ -162,7 +162,7 @@ class FilesController(private val fileService: FileService) {
     }
 
     @PatchMapping("/verify/{id}")
-    fun verify(@PathVariable id: Long): Mono<String> = fileService.verifyFile(id)
+    fun verify(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.verifyFile(id)
 
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
