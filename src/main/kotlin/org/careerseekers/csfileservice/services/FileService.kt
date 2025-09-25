@@ -107,7 +107,7 @@ class FileService(
     fun verifyFile(id: Long): Mono<String> {
         return getFileById(id)
             .flatMap { fileStorageItem ->
-                fileStorageItem .verified = true
+                fileStorageItem.verified = true
                 filesStorageRepository.save(fileStorageItem)
                     .thenReturn("File verified successfully.")
             }
