@@ -16,5 +16,5 @@ data class FilesStorage(
     val filePath: String,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-    var verified: Boolean = false,
+    var verified: Boolean? = null,
 )

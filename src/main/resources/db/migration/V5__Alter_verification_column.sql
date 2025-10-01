@@ -1,0 +1,2 @@
+ALTER TABLE files_storage
+    ALTER COLUMN verified SET DEFAULT NULL;
