@@ -161,8 +161,9 @@ class FilesController(private val fileService: FileService) {
         return fileService.saveFile(file, FileTypes.DIRECTION_ICON)
     }
 
-    @PatchMapping("/verify/{id}")
-    fun verify(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.verifyFile(id)
+    @PatchMapping("/verify/{id}/{verification}")
+    fun verify(@PathVariable id: Long, @PathVariable verification: Boolean): Mono<BasicSuccessfulResponse<String>> =
+        fileService.verifyFile(id, verification)
 
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Mono<BasicSuccessfulResponse<String>> = fileService.deleteById(id)
