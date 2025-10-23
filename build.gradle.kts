@@ -35,6 +35,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -82,6 +83,9 @@ dependencies {
 
     // Utilities
     implementation("one.stayfocused.spring:dotenv-spring-boot:1.0.0")
+    implementation("org.aspectj:aspectjweaver")
+    implementation("org.apache.poi:poi:5.4.0")
+    implementation("org.apache.poi:poi-ooxml:5.4.0")
 
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
